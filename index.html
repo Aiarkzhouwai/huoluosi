@@ -14,14 +14,15 @@
     </style>
 </head>
 <body>
-    <a href="https://neteaseark.vercel.app/qrlogin.html" data-immersive-translate-effect="1" data-immersive_translate_walked="78f9a969-8d8f-434e-8bdf-45bfcf9cd109">二维码登录</a> 
+    <div><a href="https://neteaseark.vercel.app/qrlogin.html" data-immersive-translate-effect="1" data-immersive_translate_walked="78f9a969-8d8f-434e-8bdf-45bfcf9cd109">二维码登录</a></div>  
+    <div><a href="https://neteaseark.vercel.app/likelist?uid=129561938" >歌单</a></div>
     <button id="fetchButton">获取喜欢的歌曲列表</button>
     <div id="result"></div>
     <div id="error" style="color: red;"></div>
 
     <script>
-        document.getElementById('fetchButton').addEventListener('click', function() {
-            fetch('https://neteaseark.vercel.app/likelist?uid=129561938', { 
+        document.getElementById('fetchButton').addEventListener('click', function() { 
+            fetch('https://neteaseark.vercel.app/likelist?uid=129561938', {  
                 method: 'GET'
             })
             .then(response => {
