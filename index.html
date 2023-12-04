@@ -1,9 +1,77 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Welcome to My Page</title>
+    <title>Netease Cloud Music Likelist Fetcher</title> 
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 5px;
+            text-align: left;
+        }
+    </style>
 </head>
 <body>
-  <h1>GeFei</h1> 
+    <a href="https://neteaseark.vercel.app/qrlogin.html" data-immersive-translate-effect="1" data-immersive_translate_walked="78f9a969-8d8f-434e-8bdf-45bfcf9cd109">二维码登录</a> 
+    <button id="fetchButton">获取喜欢的歌曲列表</button>
+    <div id="result"></div>
+    <div id="error" style="color: red;"></div>
+
+    <script>
+        document.getElementById('fetchButton').addEventListener('click', function() {
+            fetch('https://neteaseark.vercel.app/likelist?uid=129561938', { 
+                method: 'GET'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('网络响应错误: ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!data.ids) {
+                    throw new Error('响应中未找到 ids');
+                }
+
+                const idsString = data.ids.join(',');
+                //const resultDiv = document.getElementById('result');
+                //resultDiv.innerHTML = '获取的歌曲ID字符串: ' + idsString + '<br>';
+
+                return fetch(`https://neteaseark.vercel.app/song/detail?ids=${idsString}`, {
+                    method: 'GET'
+                });
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('网络响应错误: ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(details => {
+                const resultDiv = document.getElementById('result');
+                let tableHTML = '<table><tr><th>ID</th><th>歌曲名称</th><th>作者</th><th>专辑</th></tr>';
+
+                details.songs.forEach(song => {
+                    tableHTML += `
+                        <tr>
+                            <td>${song.id}</td>
+                            <td>${song.name}</td>
+                            <td>${song.ar.map(artist => artist.name).join(', ')}</td>
+                            <td>${song.al.name}</td>
+                        </tr>
+                    `;
+                });
+
+                tableHTML += '</table>';
+                resultDiv.innerHTML += tableHTML; // 将生成的表格 HTML 添加到结果 div
+            })
+            .catch(error => {
+                console.error('错误:', error);
+                document.getElementById('error').textContent = '错误: ' + error.message;
+            });
+        });
+    </script>
 </body>
 </html>
