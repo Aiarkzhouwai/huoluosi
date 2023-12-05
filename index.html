@@ -21,19 +21,28 @@
     <div><a href="https://neteaseark.vercel.app/qrlogin.html" data-immersive-translate-effect="1" data-immersive_translate_walked="78f9a969-8d8f-434e-8bdf-45bfcf9cd109">二维码登录</a></div>  
     <div id="loginStatus">登录状态: 未知</div> <!-- 显示登录状态的元素 -->
     <div id="userInfo"></div> <!-- 显示用户信息 -->
-    <div><a href="https://neteaseark.vercel.app/likelist?uid=129561938" >获取歌单id</a></div>
+    <div><a id="likelistLink" href="#">获取歌单id</a></div>
     <button id="fetchButton">获取喜欢的歌曲列表</button>
     <div id="result"></div>
     <div id="error" style="color: red;"></div>
 
     <script>
+
+        let userId; // 全局变量，用于存储用户ID
+
         document.getElementById('fetchButton').addEventListener('click', function() { 
-            fetch('https://neteaseark.vercel.app/likelist?uid=129561938', {  
+
+            if (!userId) {
+                alert('未检测到用户ID，请先登录！');
+                return;
+            }
+
+            fetch('https://neteaseark.vercel.app/likelist?uid=${userId}', {  
                 method: 'GET'
             })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('网络响应错误: ' + response.statusText);
+                    throw new Error('网络响应错误1: ' + response.statusText);
                 }
                 return response.json();
             })
@@ -52,7 +61,7 @@
             })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('网络响应错误: ' + response.statusText);
+                    throw new Error('网络响应错误2: ' + response.statusText);
                 }
                 return response.json();
             })
@@ -95,9 +104,13 @@
                 // 更新登录状态显示
                 const statusDiv = document.getElementById('loginStatus');
                 const userInfoDiv = document.getElementById('userInfo');
+                const likelistLink = document.getElementById('likelistLink'); // 获取链接元素
                 if (data && data.data && data.data.code === 200) {
                     const account = data.data.account;
                     const profile = data.data.profile;
+                    userId = account.id; // 保存用户ID到全局变量
+                    console.log("已登录，用户ID:", userId);
+                    likelistLink.href = `https://neteaseark.vercel.app/likelist?uid=${userId}`; // 更新链接的 href 属性
                     statusDiv.textContent = '登录状态: 已登录';
                     userInfoDiv.innerHTML = `
                         <div class="user-info">
@@ -109,6 +122,8 @@
                 } else {
                     statusDiv.textContent = '登录状态: 未登录';
                     userInfoDiv.innerHTML = '';
+                    userId = null; // 清除用户ID
+                    likelistLink.href = '#';
                 }
             })
             .catch(error => {
