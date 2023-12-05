@@ -11,11 +11,17 @@
             padding: 5px;
             text-align: left;
         }
+        .user-info img {
+            width: 100px;
+            height: auto;
+        }
     </style>
 </head>
 <body>
     <div><a href="https://neteaseark.vercel.app/qrlogin.html" data-immersive-translate-effect="1" data-immersive_translate_walked="78f9a969-8d8f-434e-8bdf-45bfcf9cd109">二维码登录</a></div>  
-    <div><a href="https://neteaseark.vercel.app/likelist?uid=129561938" >歌单</a></div>
+    <div id="loginStatus">登录状态: 未知</div> <!-- 显示登录状态的元素 -->
+    <div id="userInfo"></div> <!-- 显示用户信息 -->
+    <div><a href="https://neteaseark.vercel.app/likelist?uid=129561938" >获取歌单id</a></div>
     <button id="fetchButton">获取喜欢的歌曲列表</button>
     <div id="result"></div>
     <div id="error" style="color: red;"></div>
@@ -73,6 +79,49 @@
                 document.getElementById('error').textContent = '错误: ' + error.message;
             });
         });
+
+
+        function fetchLoginStatus() {
+            fetch('https://neteaseark.vercel.app/login/status', {
+                method: 'GET'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('网络响应错误: ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // 更新登录状态显示
+                const statusDiv = document.getElementById('loginStatus');
+                const userInfoDiv = document.getElementById('userInfo');
+                if (data && data.data && data.data.code === 200) {
+                    const account = data.data.account;
+                    const profile = data.data.profile;
+                    statusDiv.textContent = '登录状态: 已登录';
+                    userInfoDiv.innerHTML = `
+                        <div class="user-info">
+                            <p>ID: ${account.id}</p>
+                            <p>昵称: ${profile.nickname}</p>
+                            <img src="${profile.avatarUrl}" alt="${profile.nickname}">
+                        </div>
+                    `;
+                } else {
+                    statusDiv.textContent = '登录状态: 未登录';
+                    userInfoDiv.innerHTML = '';
+                }
+            })
+            .catch(error => {
+                console.error('错误:', error);
+                document.getElementById('loginStatus').textContent = '登录状态: 获取失败';
+                document.getElementById('userInfo').innerHTML = '';
+            });
+        }
+
+        // 其余的代码保持不变
+
+        // 页面加载时获取登录状态
+        document.addEventListener('DOMContentLoaded', fetchLoginStatus);
     </script>
 </body>
 </html>
