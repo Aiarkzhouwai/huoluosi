@@ -37,11 +37,13 @@
                 return;
             }
 
-            fetch('https://neteaseark.vercel.app/likelist?uid=129561938', {   
+        const tmdlink='https://neteaseark.vercel.app/likelist?uid='+userId 
+            
+            fetch(tmdlink, {    
                 method: 'GET'
             })
             .then(response => {
-                if (!response.ok) {
+                if (!response.ok) { 
                     throw new Error('网络响应错误1: ' + response.statusText);
                 }
                 return response.json();
