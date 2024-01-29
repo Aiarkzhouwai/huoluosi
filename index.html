@@ -16,130 +16,14 @@
             height: auto;
         }
     </style>
+    <script src="main.js"></script> 
 </head>
 <body>
-    <div><a href="https://neteaseark.vercel.app/qrlogin.html" data-immersive-translate-effect="1" data-immersive_translate_walked="78f9a969-8d8f-434e-8bdf-45bfcf9cd109">二维码登录</a></div>    
-    <div><a href="https://neteaseark.vercel.app/login/status">登录确认</a></div> 
-    <div id="loginStatus">登录状态: 未知</div> <!-- 显示登录状态的元素 -->
-    <div id="userInfo"></div> <!-- 显示用户信息 -->
-    <div><a id="likelistLink" href="#">获取歌单id</a></div>
-    <button id="fetchButton">获取喜欢的歌曲列表</button>
-    <div id="result"></div>
-    <div id="error" style="color: red;"></div>
-
-    <script>
-
-        let userId; // 全局变量，用于存储用户ID
-
-        document.getElementById('fetchButton').addEventListener('click', function() { 
-
-            if (!userId) {
-                alert('未检测到用户ID，请先登录！');
-                return;
-            }
-
-        const tmdlink='https://neteaseark.vercel.app/likelist?uid='+userId 
-            
-            fetch(tmdlink, {    
-                method: 'GET'
-            })
-            .then(response => {
-                if (!response.ok) { 
-                    throw new Error('网络响应错误1: ' + response.statusText);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (!data.ids) {
-                    throw new Error('响应中未找到 ids');
-                }
-
-                const idsString = data.ids.join(',');
-                //const resultDiv = document.getElementById('result');
-                //resultDiv.innerHTML = '获取的歌曲ID字符串: ' + idsString + '<br>';
-
-                return fetch(`https://neteaseark.vercel.app/song/detail?ids=${idsString}`, {
-                    method: 'GET'
-                });
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('网络响应错误2: ' + response.statusText);
-                }
-                return response.json();
-            })
-            .then(details => {
-                const resultDiv = document.getElementById('result');
-                let tableHTML = '<table><tr><th>ID</th><th>歌曲名称</th><th>作者</th><th>专辑</th></tr>';
-
-                details.songs.forEach(song => {
-                    tableHTML += `
-                        <tr>
-                            <td>${song.id}</td>
-                            <td>${song.name}</td>
-                            <td>${song.ar.map(artist => artist.name).join(', ')}</td>
-                            <td>${song.al.name}</td>
-                        </tr>
-                    `;
-                });
-
-                tableHTML += '</table>';
-                resultDiv.innerHTML += tableHTML; // 将生成的表格 HTML 添加到结果 div
-            })
-            .catch(error => {
-                console.error('错误:', error);
-                document.getElementById('error').textContent = '错误: ' + error.message;
-            });
-        });
-
-
-        function fetchLoginStatus() {
-            fetch('https://neteaseark.vercel.app/login/status', {
-                method: 'GET'
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('网络响应错误: ' + response.statusText);
-                }
-                return response.json();
-            })
-            .then(data => {
-                // 更新登录状态显示
-                const statusDiv = document.getElementById('loginStatus');
-                const userInfoDiv = document.getElementById('userInfo');
-                const likelistLink = document.getElementById('likelistLink'); // 获取链接元素
-                if (data && data.data && data.data.code === 200) {
-                    const account = data.data.account;
-                    const profile = data.data.profile;
-                    userId = account.id; // 保存用户ID到全局变量
-                    console.log("已登录，用户ID:", userId);
-                    likelistLink.href = `https://neteaseark.vercel.app/likelist?uid=${userId}`; // 更新链接的 href 属性
-                    statusDiv.textContent = '登录状态: 已登录';
-                    userInfoDiv.innerHTML = `
-                        <div class="user-info">
-                            <p>ID: ${account.id}</p>
-                            <p>昵称: ${profile.nickname}</p>
-                            <img src="${profile.avatarUrl}" alt="${profile.nickname}">
-                        </div>
-                    `;
-                } else {
-                    statusDiv.textContent = '登录状态: 未登录';
-                    userInfoDiv.innerHTML = '';
-                    userId = null; // 清除用户ID
-                    likelistLink.href = '#';
-                }
-            })
-            .catch(error => {
-                console.error('错误:', error);
-                document.getElementById('loginStatus').textContent = '登录状态: 获取失败';
-                document.getElementById('userInfo').innerHTML = '';
-            });
-        }
-
-        // 其余的代码保持不变
-
-        // 页面加载时获取登录状态
-        document.addEventListener('DOMContentLoaded', fetchLoginStatus);
-    </script>
+     <script>
+         const PinyinMatch = require('pinyin-match'); 
+         let test = '123曾经沧海难为水除却巫山不是云'
+         consle.log(PinyinMatch.match(test, '23曾')); // [1, 3] 
+     </script> 
+    
 </body>
 </html>
